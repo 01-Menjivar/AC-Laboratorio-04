@@ -1,0 +1,342 @@
+
+<!doctype html>
+
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>Laboratorio 5: Interrupciones de Modo Texto</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/claat-public/codelab-elements.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <google-codelab-analytics gaid="UA-49880327-14" ga4id=""></google-codelab-analytics>
+  <google-codelab codelab-gaid=""
+                  codelab-ga4id=""
+                  id="laboratorio-05-arquitectura-practico"
+                  title="Laboratorio 5: Interrupciones de Modo Texto"
+                  environment="web"
+                  feedback-link="">
+    
+      <google-codelab-step label="Objetivos de Aprendizaje" duration="0">
+        <p>Esta práctica tiene como objetivo lograr que aprendas lo siguiente:</p>
+<ul>
+<li><strong>Utilizar interrupciones básicas:</strong> Entender cómo llamar funciones del BIOS y de MS-DOS.</li>
+<li><strong>Dibujar e interactuar en modo texto:</strong> Configurar la pantalla, mover el cursor y dar color a nuestro texto.</li>
+<li><strong>Leer el teclado:</strong> Esperar y detectar pulsaciones de teclas del usuario.</li>
+<li><strong>Manejar pantallas virtuales:</strong> Trabajar con diferentes páginas de video.</li>
+</ul>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Concepto Inicial: ¿Qué es una Interrupción?" duration="0">
+        <p>Una <strong>interrupción</strong> es una señal que le pide al procesador que detenga un momento lo que está haciendo y ejecute una tarea especial del sistema (como pintar un pixel, leer el teclado o terminar un programa). En ensamblador las llamamos usando la instrucción <code>INT</code> seguida del número de interrupción.</p>
+<ul>
+<li><strong>Servicios del BIOS (</strong><strong><code>INT 10h</code></strong><strong>, </strong><strong><code>INT 16h</code></strong><strong>):</strong> Funciones de muy bajo nivel integradas en la tarjeta madre de la computadora. Controlan directamente el video y el teclado.</li>
+<li><strong>Servicios de MS-DOS (</strong><strong><code>INT 21h</code></strong><strong>):</strong> Funciones del sistema operativo, útiles para tareas como imprimir frases completas de forma sencilla.</li>
+</ul>
+<p>Comencemos a crear nuestro programa. Abre tu editor de código y prepara tu primer archivo bajo el nombre <code>practica[NombreApellido].asm</code>. En este laboratorio trabajaremos directamente con <strong>subrutinas</strong> (<code>CALL</code> y <code>RET</code>) para organizar nuestro código desde el principio.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Paso 1: Configurar la Pantalla (Esqueleto Inicial)" duration="0">
+        <p>Lo primero que debe hacer nuestro programa es limpiar la pantalla y configurar el modo de video correcto.</p>
+<p>La interrupción para el video es la <strong><code>INT 10h</code></strong>. Dado que esta interrupción controla muchas cosas, debemos decirle qué acción específica deseamos realizar cargando valores en los registros:</p>
+<ul>
+<li>El registro <strong><code>AH</code></strong> es el &#34;registro de función&#34;. Al cargar <code>AH = 00h</code>, le indicamos al BIOS que queremos <em>Establecer el Modo de Pantalla</em>.</li>
+<li>El registro <strong><code>AL</code></strong> indica qué modo queremos activar. Al cargar <code>AL = 03h</code>, seleccionamos el <em>Modo Texto Estándar de 80 columnas por 25 filas a color</em>.</li>
+</ul>
+<h2 is-upgraded>Escribe las siguientes líneas en tu archivo:</h2>
+<pre><code language="language-nasm" class="language-nasm">org   100h
+
+section .text
+
+main:
+    CALL IniciarModoTexto ; Llamamos a la subrutina para configurar la pantalla
+
+    ; Terminar el programa
+    INT 20h               ; Concluye la ejecución y regresa al sistema operativo
+
+; ================= SUBRUTINAS =================
+
+IniciarModoTexto:
+    MOV AH, 00h           ; AH = 00h selecciona la función de configurar modo
+    MOV AL, 03h           ; AL = 03h selecciona el modo de texto 80x25
+    INT 10h               ; Llamamos a la interrupción de video del BIOS
+    RET                   ; Regresar a donde fuimos llamados
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Paso 2: El modo texto y las coordenadas del cursor" duration="0">
+        <p>En el modo de texto estándar (<code>03h</code>), la pantalla se comporta como una cuadrícula:</p>
+<ul>
+<li>Tiene <strong>80 columnas de ancho</strong> (coordenadas en el eje X de <code>0</code> a <code>79</code>).</li>
+<li>Tiene <strong>25 filas de alto</strong> (coordenadas en el eje Y de <code>0</code> a <code>24</code>).</li>
+<li>La esquina superior izquierda es la coordenada <code>(0, 0)</code>.</li>
+</ul>
+<p>Antes de imprimir algo en una posición específica, debemos mover el cursor a esa coordenada. Para ello, crearemos la subrutina <code>CentrarCursor</code> usando la función <strong><code>02h</code></strong> de la <strong><code>INT 10h</code></strong>:</p>
+<ul>
+<li><code>AH = 02h</code>: Código de la función de mover cursor.</li>
+<li><code>BH</code>: Número de la página de video (usaremos la página <code>0d</code> por defecto).</li>
+<li><code>DH</code>: Número de fila (usaremos la <code>10</code> para estar cerca del centro).</li>
+<li><code>DL</code>: Número de columna (usaremos la <code>25</code>).</li>
+</ul>
+<h2 is-upgraded>Agrega la subrutina y llamala en el <code>main</code></h2>
+<p>Agrega la subrutina en la sección de subrutinas:</p>
+<pre><code language="language-nasm" class="language-nasm">CentrarCursor:
+    MOV AH, 02h           ; AH = 02h selecciona la función de mover cursor
+    MOV BH, 0d            ; BH = 0d indica la página de video 0 (la activa)
+    MOV DH, 10            ; DH = 10 es la fila de destino (eje Y)
+    MOV DL, 25            ; DL = 25 es la columna de destino (eje X)
+    INT 10h               ; Llamamos al BIOS para mover el cursor
+    RET
+</code></pre>
+<p>Modifica tu <code>main</code>:</p>
+<pre><code language="language-nasm" class="language-nasm">main:
+    CALL IniciarModoTexto
+    CALL CentrarCursor    ; &lt;--- Nueva llamada agregada
+    INT 20h
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Paso 3: Entender los Atributos de Color (Esquema IRGB)" duration="0">
+        <p>Cada celda de la pantalla de texto contiene dos datos: el carácter que se muestra y su <strong>color</strong>. El color de cada carácter se define usando un único byte (8 bits) conocido como <strong>byte de atributo</strong>.</p>
+<p>Este byte se divide en dos partes:</p>
+<ul>
+<li><strong>Los 4 bits superiores (bits 4 a 7):</strong> Controlan el <strong>color de fondo</strong> de la celda.</li>
+<li><strong>Los 4 bits inferiores (bits 0 a 3):</strong> Controlan el <strong>color del texto (frente)</strong>.</li>
+</ul>
+<p>Cada grupo de 4 bits sigue el formato <strong>IRGB</strong>:</p>
+<ul>
+<li><strong><code>I</code></strong> (Intensidad / Brillo): Si es 1, el color es claro y brillante; si es 0, es oscuro u opaco.</li>
+<li><strong><code>R</code></strong> (Red / Rojo)</li>
+<li><strong><code>G</code></strong> (Green / Verde)</li>
+<li><strong><code>B</code></strong> (Blue / Azul)</li>
+</ul>
+<p>Estas combinaciones nos permiten desplegar hasta 16 colores diferentes en la consola DOS:</p>
+<p class="image-container"><img alt="Paleta de 16 colores DOS" src="img/e1a391b02dd95a10.png"></p>
+<h2 is-upgraded>Ejemplo de cálculo del byte de atributo:</h2>
+<p>Supongamos que queremos mostrar texto en <strong>letras blancas brillantes</strong> (<code>Fh</code> o <code>1111</code> en binario) sobre un <strong>fondo azul</strong> (<code>1h</code> o <code>0001</code> en binario):</p>
+<ul>
+<li>Fondo (bits altos): <code>0001</code></li>
+<li>Frente (bits bajos): <code>1111</code></li>
+<li>Byte resultante: <code>1Fh</code> (en binario: <code>0001 1111</code>).</li>
+</ul>
+<h2 is-upgraded>Escribir un carácter con color</h2>
+<p>Para imprimir un carácter usando este atributo, crearemos la subrutina <code>PintarCaracter</code> usando la función <strong><code>09h</code></strong> de la <strong><code>INT 10h</code></strong>:</p>
+<ul>
+<li><code>AH = 09h</code>: Función de escribir carácter y atributo.</li>
+<li><code>AL</code>: Código ASCII del carácter que queremos escribir (por ejemplo, <code>'X'</code>).</li>
+<li><code>BH</code>: Página de video (<code>0d</code>).</li>
+<li><code>BL</code>: Byte de atributo de color (<code>1Fh</code>).</li>
+<li><code>CX</code>: Cantidad de veces que se repetirá el carácter horizontalmente (escribiremos <code>1</code>).</li>
+</ul>
+<h2 is-upgraded>Agrega la subrutina y llamala en el <code>main</code></h2>
+<p>Agrega la subrutina:</p>
+<pre><code language="language-nasm" class="language-nasm">PintarCaracter:
+    MOV AH, 09h           ; AH = 09h selecciona escribir carácter y atributo
+    MOV AL, &#39;X&#39;           ; AL tiene el carácter a imprimir
+    MOV BH, 0d            ; BH = página de video 0
+    MOV BL, 1Fh           ; BL = Atributo calculado (Fondo azul, letras blancas)
+    MOV CX, 1d            ; CX = imprimir el carácter una sola vez
+    INT 10h               ; Llamamos al BIOS
+    RET
+</code></pre>
+<p>Modifica tu <code>main</code>:</p>
+<pre><code language="language-nasm" class="language-nasm">main:
+    CALL IniciarModoTexto
+    CALL CentrarCursor
+    CALL PintarCaracter   ; &lt;--- Nueva llamada agregada
+    INT 20h
+</code></pre>
+<p>Ensambla y ejecuta tu programa. Deberías ver una letra ‘X&#39; pintada en color blanco con fondo azul cerca del centro de la pantalla. Sin embargo, notarás que la ventana se cierra casi instantáneamente.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Paso 4: Detener la pantalla y Leer el Teclado" duration="0">
+        <p>Para evitar que el programa se cierre de golpe antes de que podamos ver el resultado, debemos pausar el programa y esperar a que el usuario presione una tecla.</p>
+<p>Usaremos la interrupción del BIOS para teclado <strong><code>INT 16h</code></strong> con la función <strong><code>AH = 00h</code></strong>, la cual detiene el programa en espera de una pulsación de tecla y retorna su código ASCII en <code>AL</code>.</p>
+<h2 is-upgraded>Agrega la llamada en el <code>main</code> y la subrutina abajo:</h2>
+<p>Modifica tu <code>main</code>:</p>
+<pre><code language="language-nasm" class="language-nasm">main:
+    CALL IniciarModoTexto
+    CALL CentrarCursor
+    CALL PintarCaracter
+    CALL EsperarTecla     ; &lt;--- Nueva llamada agregada
+    INT 20h
+</code></pre>
+<p>Agrega la subrutina:</p>
+<pre><code language="language-nasm" class="language-nasm">EsperarTecla:
+    MOV AH, 00h           ; AH = 00h selecciona la función de leer teclado
+    INT 16h               ; Llamar al BIOS (el programa se detiene aquí)
+    RET
+</code></pre>
+<p>Ensambla y ejecuta. Ahora el programa se mantendrá en pausa mostrando la ‘X&#39; coloreada en pantalla, y solo se cerrará cuando presiones cualquier tecla.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Paso 5: Frases Completas y Páginas de Video" duration="0">
+        <p>Escribir carácter por carácter con <code>INT 10h / AH = 09h</code> sería sumamente largo para textos extensos. Para imprimir frases completas usaremos la función <strong><code>09h</code></strong> de la interrupción de MS-DOS <strong><code>INT 21h</code></strong>:</p>
+<ul>
+<li><code>DX</code>: Dirección de memoria de inicio de la cadena de texto.</li>
+<li><strong>Requisito:</strong> El texto debe declararse en la sección de datos (<code>.data</code>) y terminar obligatoriamente con el carácter <strong><code>$</code></strong>.</li>
+</ul>
+<p>Además, el BIOS cuenta con hasta 8 pantallas virtuales o &#34;páginas&#34; (0 a 7). La función de <strong>Cambiar la Página Activa (</strong></p>
+<p><strong><code>INT 10h / AH = 05h</code></strong></p>
+<p><strong>)</strong> define cuál de esas páginas se muestra en el monitor, lo que nos permite alternar entre pantallas completas instantáneamente.</p>
+<h2 is-upgraded>Reestructuración del Programa Final</h2>
+<p>Modificaremos el código para que en lugar de pintar una sola ‘X&#39; (eliminamos <code>CALL PintarCaracter</code>), muestre un mensaje en la página <code>0</code>, espere una tecla, cambie a la página <code>1</code>, muestre otro mensaje allí y termine.</p>
+<p>Modifica tu archivo completo para que quede así:</p>
+<pre><code language="language-nasm" class="language-nasm">org   100h
+
+section .data
+    msgPagina0 db &#39;Estas en la pagina 0. Presione una tecla...$&#39;
+    msgPagina1 db &#39;Ahora cambiaste a la pagina 1! Fin del programa.$&#39;
+
+section .text
+
+main:
+    CALL IniciarModoTexto
+    
+    ; --- Trabajar en la Página 0 ---
+    MOV BH, 0d            ; Seleccionar página de video 0 para centrar el cursor
+    CALL CentrarCursor
+    
+    MOV AH, 09h           ; Imprimir el mensaje de la página 0 usando DOS
+    MOV DX, msgPagina0
+    INT 21h
+    
+    CALL EsperarTecla     ; Detener pantalla esperando teclado
+    
+    ; --- Cambiar a la Página 1 ---
+    CALL CambiarAPagina1
+    
+    MOV BH, 1d            ; Seleccionar la página de video 1 para las funciones del cursor
+    CALL CentrarCursor
+    
+    MOV AH, 09h           ; Imprimir el mensaje de la página 1 usando DOS
+    MOV DX, msgPagina1
+    INT 21h
+    
+    CALL EsperarTecla     ; Esperar tecla final antes de salir
+    INT 20h               ; Finalizar programa
+
+; ================= SUBRUTINAS =================
+
+IniciarModoTexto:
+    MOV AH, 00h
+    MOV AL, 03h           ; Limpia pantalla y define modo texto 80x25
+    INT 10h
+    RET
+
+CentrarCursor:
+    MOV AH, 02h
+    ; BH define en qué página queremos mover el cursor (se asigna en main)
+    MOV DH, 12            ; Fila central
+    MOV DL, 18            ; Columna inicial
+    INT 10h
+    RET
+
+CambiarAPagina1:
+    MOV AH, 05h
+    MOV AL, 01h           ; Activar y mostrar la página 1 en el monitor
+    INT 10h
+    RET
+
+EsperarTecla:
+    MOV AH, 00h
+    INT 16h               ; Pausa esperando una pulsación
+    RET
+</code></pre>
+<p>Ensambla y ejecuta esta versión final. Verás el flujo completo: mostrará un texto en la página 0, al presionar una tecla cambiará a la página 1 mostrando otro texto, y finalizará tras la segunda pulsación.</p>
+<p><strong>Guarda este archivo final como tu primer entregable de la práctica (</strong></p>
+<p><strong><code>practica[NombreApellido].asm</code></strong></p>
+<p><strong>).</strong></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Resumen" duration="0">
+        <h2 is-upgraded>Funciones de Video (<code>INT 10h</code>)</h2>
+<ul>
+<li><strong><code>AH = 00h</code></strong><strong> (Establecer Modo): </strong><code>AL</code> = Código de modo (ej. <code>03h</code> texto 80x25).</li>
+<li><strong><code>AH = 02h</code></strong><strong> (Mover Cursor): </strong><code>BH</code> = Página, <code>DH</code> = Fila, <code>DL</code> = Columna.</li>
+<li><strong><code>AH = 05h</code></strong><strong> (Cambiar Página Activa): </strong><code>AL</code> = Número de página a mostrar.</li>
+<li><strong><code>AH = 09h</code></strong><strong> (Escribir Carácter y Color): </strong><code>AL</code> = Carácter ASCII, <code>BH</code> = Página, <code>BL</code> = Atributo (color), <code>CX</code> = Cantidad de repeticiones.</li>
+</ul>
+<h2 is-upgraded>Funciones Auxiliares de Video</h2>
+<ul>
+<li><strong><code>AH = 01h</code></strong><strong> (Cambiar apariencia del cursor): </strong><code>CH</code> = Línea inicio, <code>CL</code> = Línea fin.</li>
+<li><strong><code>AH = 03h</code></strong><strong> (Leer posición del cursor): </strong><code>BH</code> = Página. Retorna: <code>DH</code> = Fila, <code>DL</code> = Columna.</li>
+<li><strong><code>AH = 08h</code></strong><strong> (Leer carácter y color en cursor): </strong><code>BH</code> = Página. Retorna: <code>AL</code> = ASCII, <code>AH</code> = Atributo.</li>
+</ul>
+<h2 is-upgraded>Funciones de Teclado y Sistema</h2>
+<ul>
+<li><strong><code>INT 16h / AH = 00h</code></strong><strong> (Leer Teclado):</strong> Pausa el programa. Retorna el ASCII de la tecla en <code>AL</code>.</li>
+<li><strong><code>INT 21h / AH = 09h</code></strong><strong> (Imprimir Cadena DOS): </strong><code>DX</code> = Dirección del mensaje (debe finalizar con <code>$</code>).</li>
+<li><strong><code>INT 20h</code></strong><strong> (Finalizar):</strong> Devuelve el control a DOS.</li>
+</ul>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Ejercicio" duration="0">
+        <p>A partir del código modular que construiste en el Paso 5, crea un nuevo archivo llamado <code>ejercicio[TuNombreTuApellido].asm</code> con las siguientes especificaciones:</p>
+<h2 is-upgraded>Desafío: El Menú Interactivo de Colores</h2>
+<p>Diseña un programa que le permita al usuario elegir el color del texto a mostrar en pantalla:</p>
+<ol type="1">
+<li><strong>Menú Inicial:</strong> Al arrancar el programa, limpia la pantalla en modo texto y muestra un mensaje centrado: <code>"Seleccione un color: (1) Azul o (2) Rojo: "</code></li>
+<li><strong>Lectura:</strong> El programa debe esperar a que el usuario presione una tecla (<code>INT 16h / AH = 00h</code>). El código ASCII de la tecla presionada quedará en <code>AL</code>.</li>
+<li><strong>Evaluación (Comparación):</strong><ul>
+<li>Si el usuario presiona la tecla <strong><code>'1'</code></strong> (código ASCII <code>31h</code> o <code>'1'</code>): debe limpiar la pantalla, mover el cursor al centro de la pantalla y pintar sus iniciales (ejemplo: <code>E.C.</code>) con <strong>letras blancas sobre fondo azul</strong> (Atributo <code>1Fh</code>) usando <code>INT 10h / AH = 09h</code> para cada carácter.</li>
+<li>Si el usuario presiona la tecla <strong><code>'2'</code></strong> (código ASCII <code>32h</code> o <code>'2'</code>): debe hacer lo mismo pero mostrando sus iniciales con <strong>letras amarillas sobre fondo rojo</strong> (Atributo <code>4Eh</code>).</li>
+<li>Si presiona <strong>cualquier otra tecla</strong>: el programa debe finalizar directamente sin mostrar nada más.</li>
+</ul>
+</li>
+<li><strong>Espera final:</strong> Tras mostrar las iniciales coloreadas, el programa debe esperar una tecla final antes de cerrarse con <code>INT 20h</code>.</li>
+</ol>
+<h2 is-upgraded>Indicaciones de entrega en Moodle</h2>
+<p>Debes subir <strong>dos archivos</strong> con la nomenclatura estricta:</p>
+<ol type="1">
+<li><code>practica[NombreApellido].asm</code> (El código incremental final del Paso 5).</li>
+<li><code>ejercicio[NombreApellido].asm</code> (Tu solución al desafío del Menú de Colores).</li>
+</ol>
+
+
+      </google-codelab-step>
+    
+  </google-codelab>
+
+  <script src="https://storage.googleapis.com/claat-public/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/prettify.js"></script>
+  <script src="https://storage.googleapis.com/claat-public/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+  <script>
+      const fabs = document.querySelector("#fabs");
+      const done = document.querySelector("#done");
+      const codelabNavButtons = document.querySelector("#codelab-nav-buttons");
+      const arrowBack = document.querySelector("#arrow-back");
+      fabs.removeChild(done);
+      codelabNavButtons.removeChild(arrowBack);
+    </script>
+</body>
+</html>
