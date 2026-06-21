@@ -3,12 +3,12 @@
   "format": "html",
   "prefix": "https://storage.googleapis.com",
   "mainga": "UA-49880327-14",
-  "updated": "2026-06-21T17:24:35-06:00",
-  "id": "laboratorio-05-arquitectura-practico",
+  "updated": "2026-06-21T17:57:57-06:00",
+  "id": "laboratorio-04-arquitectura-practico",
   "duration": 0,
-  "title": "Laboratorio 5: Interrupciones de Modo Texto",
+  "title": "Laboratorio 4: Interrupciones de Modo Texto",
   "authors": "Oscar Menjivar",
-  "summary": "Laboratorio 05 - Interrupciones de Modo Texto",
+  "summary": "Laboratorio 04 - Interrupciones de Modo Texto",
   "source": "README.md",
   "theme": "",
   "status": [
@@ -18,5 +18,5 @@
     "ensamblador"
   ],
   "tags": [],
-  "url": "laboratorio-05-arquitectura-practico"
+  "url": "laboratorio-04-arquitectura-practico"
 }

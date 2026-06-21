@@ -1,10 +1,10 @@
-summary: Laboratorio 05 - Interrupciones de Modo Texto 
-id: laboratorio-05-arquitectura-practico
+summary: Laboratorio 04 - Interrupciones de Modo Texto
+id: laboratorio-04-arquitectura-practico
 categories: Ensamblador
 status: Published
 authors: Oscar Menjivar
 
-# Laboratorio 5: Interrupciones de Modo Texto 
+# Laboratorio 4: Interrupciones de Modo Texto
 
 > **Autor:** Oscar Menjivar  
 > **Categorías:** Ensamblador · Arquitectura x86 · Interrupciones
