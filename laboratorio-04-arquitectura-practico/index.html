@@ -51,7 +51,7 @@
 
       </google-codelab-step>
     
-      <google-codelab-step label="Paso 1: Configurar la Pantalla (Esqueleto Inicial)" duration="0">
+      <google-codelab-step label="Paso A: Configurar la Pantalla (Esqueleto Inicial)" duration="0">
         <p>Lo primero que debe hacer nuestro programa es limpiar la pantalla y configurar el modo de video correcto.</p>
 <p>La interrupción para el video es la <strong><code>INT 10h</code></strong>. Dado que esta interrupción controla muchas cosas, debemos decirle qué acción específica deseamos realizar cargando valores en los registros:</p>
 <ul>
@@ -81,7 +81,7 @@ IniciarModoTexto:
 
       </google-codelab-step>
     
-      <google-codelab-step label="Paso 2: El modo texto y las coordenadas del cursor" duration="0">
+      <google-codelab-step label="Paso B: El modo texto y las coordenadas del cursor" duration="0">
         <p>En el modo de texto estándar (<code>03h</code>), la pantalla se comporta como una cuadrícula:</p>
 <ul>
 <li>Tiene <strong>80 columnas de ancho</strong> (coordenadas en el eje X de <code>0</code> a <code>79</code>).</li>
@@ -115,7 +115,7 @@ IniciarModoTexto:
 
       </google-codelab-step>
     
-      <google-codelab-step label="Paso 3: Entender los Atributos de Color (Esquema IRGB)" duration="0">
+      <google-codelab-step label="Paso C: Entender los Atributos de Color (Esquema IRGB)" duration="0">
         <p>Cada celda de la pantalla de texto contiene dos datos: el carácter que se muestra y su <strong>color</strong>. El color de cada carácter se define usando un único byte (8 bits) conocido como <strong>byte de atributo</strong>.</p>
 <p>Este byte se divide en dos partes:</p>
 <ul>
@@ -170,7 +170,7 @@ IniciarModoTexto:
 
       </google-codelab-step>
     
-      <google-codelab-step label="Paso 4: Detener la pantalla y Leer el Teclado" duration="0">
+      <google-codelab-step label="Paso D: Detener la pantalla y Leer el Teclado" duration="0">
         <p>Para evitar que el programa se cierre de golpe antes de que podamos ver el resultado, debemos pausar el programa y esperar a que el usuario presione una tecla.</p>
 <p>Usaremos la interrupción del BIOS para teclado <strong><code>INT 16h</code></strong> con la función <strong><code>AH = 00h</code></strong>, la cual detiene el programa en espera de una pulsación de tecla y retorna su código ASCII en <code>AL</code>.</p>
 <h2 is-upgraded>Agrega la llamada en el <code>main</code> y la subrutina abajo:</h2>
@@ -193,7 +193,7 @@ IniciarModoTexto:
 
       </google-codelab-step>
     
-      <google-codelab-step label="Paso 5: Frases Completas y Páginas de Video" duration="0">
+      <google-codelab-step label="Paso E: Frases Completas y Páginas de Video" duration="0">
         <p>Escribir carácter por carácter con <code>INT 10h / AH = 09h</code> sería sumamente largo para textos extensos. Para imprimir frases completas usaremos la función <strong><code>09h</code></strong> de la interrupción de MS-DOS <strong><code>INT 21h</code></strong>:</p>
 <ul>
 <li><code>DX</code>: Dirección de memoria de inicio de la cadena de texto.</li>
@@ -299,7 +299,7 @@ EsperarTecla:
       </google-codelab-step>
     
       <google-codelab-step label="Ejercicio" duration="0">
-        <p>A partir del código modular que construiste en el Paso 5, crea un nuevo archivo llamado <code>ejercicio[TuNombreTuApellido].asm</code> con las siguientes especificaciones:</p>
+        <p>A partir del código modular que construiste en el Paso E, crea un nuevo archivo llamado <code>ejercicio[TuNombreTuApellido].asm</code> con las siguientes especificaciones:</p>
 <h2 is-upgraded>Desafío: El Menú Interactivo de Colores</h2>
 <p>Diseña un programa que le permita al usuario elegir el color del texto a mostrar en pantalla:</p>
 <ol type="1">
@@ -316,7 +316,7 @@ EsperarTecla:
 <h2 is-upgraded>Indicaciones de entrega en Moodle</h2>
 <p>Debes subir <strong>dos archivos</strong> con la nomenclatura estricta:</p>
 <ol type="1">
-<li><code>practica[NombreApellido].asm</code> (El código incremental final del Paso 5).</li>
+<li><code>practica[NombreApellido].asm</code> (El código incremental final del Paso E).</li>
 <li><code>ejercicio[NombreApellido].asm</code> (Tu solución al desafío del Menú de Colores).</li>
 </ol>
 

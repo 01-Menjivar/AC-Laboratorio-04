@@ -32,7 +32,7 @@ Comencemos a crear nuestro programa. Abre tu editor de código y prepara tu prim
 
 ---
 
-## Paso 1: Configurar la Pantalla (Esqueleto Inicial)
+## Paso A: Configurar la Pantalla (Esqueleto Inicial)
 
 Lo primero que debe hacer nuestro programa es limpiar la pantalla y configurar el modo de video correcto.
 
@@ -63,7 +63,7 @@ IniciarModoTexto:
 
 ---
 
-## Paso 2: El modo texto y las coordenadas del cursor
+## Paso B: El modo texto y las coordenadas del cursor
 
 En el modo de texto estándar (`03h`), la pantalla se comporta como una cuadrícula:
 *   Tiene **80 columnas de ancho** (coordenadas en el eje X de `0` a `79`).
@@ -100,7 +100,7 @@ main:
 
 ---
 
-## Paso 3: Entender los Atributos de Color (Esquema IRGB)
+## Paso C: Entender los Atributos de Color (Esquema IRGB)
 
 Cada celda de la pantalla de texto contiene dos datos: el carácter que se muestra y su **color**. El color de cada carácter se define usando un único byte (8 bits) conocido como **byte de atributo**.
 
@@ -159,7 +159,7 @@ main:
 
 ---
 
-## Paso 4: Detener la pantalla y Leer el Teclado
+## Paso D: Detener la pantalla y Leer el Teclado
 
 Para evitar que el programa se cierre de golpe antes de que podamos ver el resultado, debemos pausar el programa y esperar a que el usuario presione una tecla.
 
@@ -189,7 +189,7 @@ EsperarTecla:
 
 ---
 
-## Paso 5: Frases Completas y Páginas de Video
+## Paso E: Frases Completas y Páginas de Video
 
 Escribir carácter por carácter con `INT 10h / AH = 09h` sería sumamente largo para textos extensos. Para imprimir frases completas usaremos la función **`09h`** de la interrupción de MS-DOS **`INT 21h`**:
 *   `DX`: Dirección de memoria de inicio de la cadena de texto.
@@ -293,7 +293,7 @@ EsperarTecla:
 
 ## Ejercicio 
 
-A partir del código modular que construiste en el Paso 5, crea un nuevo archivo llamado `ejercicio[TuNombreTuApellido].asm` con las siguientes especificaciones:
+A partir del código modular que construiste en el Paso E, crea un nuevo archivo llamado `ejercicio[TuNombreTuApellido].asm` con las siguientes especificaciones:
 
 ### Desafío: El Menú Interactivo de Colores
 Diseña un programa que le permita al usuario elegir el color del texto a mostrar en pantalla:
@@ -311,5 +311,5 @@ Diseña un programa que le permita al usuario elegir el color del texto a mostra
 ### Indicaciones de entrega en Moodle
 
 Debes subir **dos archivos** con la nomenclatura estricta:
-1.  `practica[NombreApellido].asm` (El código incremental final del Paso 5).
+1.  `practica[NombreApellido].asm` (El código incremental final del Paso E).
 2.  `ejercicio[NombreApellido].asm` (Tu solución al desafío del Menú de Colores).
