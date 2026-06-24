@@ -267,7 +267,7 @@ EsperarTecla:
     RET
 </code></pre>
 <p>Ensambla y ejecuta esta versión final. Verás el flujo completo: mostrará un texto en la página 0, al presionar una tecla cambiará a la página 1 mostrando otro texto, y finalizará tras la segunda pulsación.</p>
-<p>⚠️ <strong>Modificación Personalizada Obligatoria (Evitar copia):</strong> Para garantizar que tu archivo <code>practica[NombreApellido].asm</code> sea único, debes aplicar los siguientes cambios obligatorios antes de guardarlo:</p>
+<p>⚠️ <strong>Paso de Personalización Obligatoria:</strong> Aplica los siguientes cambios de personalización antes de guardar el archivo:</p>
 <ol type="1">
 <li><strong>Mensajes Personalizados:</strong> Modifica el texto de <code>msgPagina0</code> en la sección <code>.data</code> para que incluya tu <strong>primer nombre, primer apellido y tu número de carnet de la universidad</strong>. Por ejemplo: <code>msgPagina0 db 'Estas en la pagina 0 - [Oscar Menjivar - 00068422]. Presione una tecla...$'</code>.</li>
 <li><strong>Coordenadas Dinámicas:</strong> En la subrutina <code>CentrarCursor</code>, la fila no debe ser <code>12</code> por defecto. Debe ser la fila resultante de la operación: <strong>10 + (último dígito de tu carnet módulo 5)</strong>. Por ejemplo, si tu carnet termina en 7, la fila será <code>10 + (7 mod 5) = 12</code>. La columna no debe ser <code>18</code>, sino: <strong>15 + (penúltimo dígito de tu carnet)</strong>.</li>
@@ -319,7 +319,7 @@ EsperarTecla:
 <li>Si presiona <strong>cualquier otra tecla</strong>: el programa debe finalizar directamente sin mostrar nada más.</li>
 </ul>
 </li>
-<li><strong>Coordenadas Dinámicas:</strong> Para garantizar que los programas no sean idénticos, las coordenadas donde se imprimen tus iniciales deben variar según el último dígito de tu carnet: <ul>
+<li><strong>Coordenadas Dinámicas:</strong> Como parte de la personalización de tu ejercicio, las coordenadas donde se imprimen tus iniciales deben variar según el último dígito de tu carnet: <ul>
 <li>Si seleccionas <strong>Opción 1</strong>, la fila del cursor debe ser: <strong>8 + (último dígito de tu carnet módulo 4)</strong>.</li>
 <li>Si seleccionas <strong>Opción 2</strong>, la fila del cursor debe ser: <strong>14 + (último dígito de tu carnet módulo 4)</strong>.</li>
 </ul>

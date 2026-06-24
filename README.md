@@ -267,8 +267,8 @@ EsperarTecla:
 
 > Ensambla y ejecuta esta versión final. Verás el flujo completo: mostrará un texto en la página 0, al presionar una tecla cambiará a la página 1 mostrando otro texto, y finalizará tras la segunda pulsación.
 > 
-> ⚠️ **Modificación Personalizada Obligatoria (Evitar copia):**
-> Para garantizar que tu archivo `practica[NombreApellido].asm` sea único, debes aplicar los siguientes cambios obligatorios antes de guardarlo:
+> ⚠️ **Paso de Personalización Obligatoria:**
+> Aplica los siguientes cambios de personalización antes de guardar el archivo:
 > 1. **Mensajes Personalizados:** Modifica el texto de `msgPagina0` en la sección `.data` para que incluya tu **primer nombre, primer apellido y tu número de carnet de la universidad**. Por ejemplo: `msgPagina0 db 'Estas en la pagina 0 - [Oscar Menjivar - 00068422]. Presione una tecla...$'`.
 > 2. **Coordenadas Dinámicas:** En la subrutina `CentrarCursor`, la fila no debe ser `12` por defecto. Debe ser la fila resultante de la operación: **10 + (último dígito de tu carnet módulo 5)**. Por ejemplo, si tu carnet termina en 7, la fila será `10 + (7 mod 5) = 12`. La columna no debe ser `18`, sino: **15 + (penúltimo dígito de tu carnet)**.
 > 
@@ -310,7 +310,7 @@ Diseña un programa que le permita al usuario elegir el color del texto a mostra
     *   Si el usuario presiona la tecla **`'1'`** (código ASCII `31h` o `'1'`): debe limpiar la pantalla, mover el cursor a la posición correspondiente y pintar **tus propias iniciales de nombre y apellido** (ejemplo: si te llamas Juan Pérez, usa `J.P.`) con tu **[Color A]** seleccionado, usando `INT 10h / AH = 09h` para cada carácter.
     *   Si el usuario presiona la tecla **`'2'`** (código ASCII `32h` o `'2'`): debe hacer lo mismo pero mostrando **tus iniciales** con tu **[Color B]** seleccionado.
     *   Si presiona **cualquier otra tecla**: el programa debe finalizar directamente sin mostrar nada más.
-4.  **Coordenadas Dinámicas:** Para garantizar que los programas no sean idénticos, las coordenadas donde se imprimen tus iniciales deben variar según el último dígito de tu carnet:
+4.  **Coordenadas Dinámicas:** Como parte de la personalización de tu ejercicio, las coordenadas donde se imprimen tus iniciales deben variar según el último dígito de tu carnet:
     *   Si seleccionas **Opción 1**, la fila del cursor debe ser: **8 + (último dígito de tu carnet módulo 4)**.
     *   Si seleccionas **Opción 2**, la fila del cursor debe ser: **14 + (último dígito de tu carnet módulo 4)**.
 5.  **Espera final:** Tras mostrar tus iniciales coloreadas en pantalla, el programa debe esperar una tecla final antes de cerrarse con `INT 20h`.
