@@ -8,6 +8,8 @@ authors: Oscar Menjivar
 
 > **Autor:** Oscar Menjivar  
 > **Categorías:** Ensamblador · Arquitectura x86 · Interrupciones
+> 
+> ℹ️ **Nota Importante:** Este laboratorio es de **carácter estrictamente opcional**. No requiere de ninguna entrega en la plataforma Moodle ni forma parte de las actividades evaluadas del curso. Está diseñado como material de autoaprendizaje y refuerzo para tu estudio personal.
 
 ---
 
@@ -28,7 +30,7 @@ Una **interrupción** es una señal que le pide al procesador que detenga un mom
 *   **Servicios del BIOS (`INT 10h`, `INT 16h`):** Funciones de muy bajo nivel integradas en la tarjeta madre de la computadora. Controlan directamente el video y el teclado.
 *   **Servicios de MS-DOS (`INT 21h`):** Funciones del sistema operativo, útiles para tareas como imprimir frases completas de forma sencilla.
 
-Comencemos a crear nuestro programa. Abre tu editor de código y prepara tu primer archivo bajo el nombre `practica[NombreApellido].asm`. En este laboratorio trabajaremos directamente con **subrutinas** (`CALL` y `RET`) para organizar nuestro código desde el principio.
+Comencemos a crear nuestro programa. Abre tu editor de código y prepara tu primer archivo (por ejemplo, bajo el nombre `practica.asm`). En este laboratorio trabajaremos directamente con **subrutinas** (`CALL` y `RET`) para organizar nuestro código desde el principio.
 
 ---
 
@@ -267,12 +269,12 @@ EsperarTecla:
 
 > Ensambla y ejecuta esta versión final. Verás el flujo completo: mostrará un texto en la página 0, al presionar una tecla cambiará a la página 1 mostrando otro texto, y finalizará tras la segunda pulsación.
 > 
-> ⚠️ **Paso de Personalización Obligatoria:**
-> Aplica los siguientes cambios de personalización antes de guardar el archivo:
+> 💡 **Propuesta de Personalización (Opcional):**
+> Para practicar y personalizar tu ejercicio, te sugiero aplicar los siguientes cambios al código:
 > 1. **Mensajes Personalizados:** Modifica el texto de `msgPagina0` en la sección `.data` para que incluya tu **primer nombre, primer apellido y tu número de carnet de la universidad**. Por ejemplo: `msgPagina0 db 'Estas en la pagina 0 - [Oscar Menjivar - 00068422]. Presione una tecla...$'`.
 > 2. **Coordenadas Dinámicas:** En la subrutina `CentrarCursor`, la fila no debe ser `12` por defecto. Debe ser la fila resultante de la operación: **10 + (último dígito de tu carnet módulo 5)**. Por ejemplo, si tu carnet termina en 7, la fila será `10 + (7 mod 5) = 12`. La columna no debe ser `18`, sino: **15 + (penúltimo dígito de tu carnet)**.
 > 
-> **Guarda este archivo final modificado como tu primer entregable de la práctica (`practica[NombreApellido].asm`).**
+> **Guarda este archivo modificado para tus pruebas (por ejemplo, como `practica.asm`).**
 
 ---
 
@@ -298,13 +300,13 @@ EsperarTecla:
 
 ## Ejercicio 
 
-A partir del código modular que construiste en el Paso E, crea un nuevo archivo llamado `ejercicio[TuNombreTuApellido].asm` con las siguientes especificaciones:
+A partir del código modular que construiste en el Paso E, te sugiero crear un archivo (por ejemplo, bajo el nombre `ejercicio.asm`) con las siguientes especificaciones:
 
 ### Desafío: El Menú Interactivo de Colores Personalizado
 Diseña un programa que le permita al usuario elegir el color del texto a mostrar en pantalla:
 1.  **Menú Inicial:** Al arrancar el programa, limpia la pantalla en modo texto y muestra un mensaje centrado:
     `"Seleccione un color: (1) [Color A] o (2) [Color B]: "`
-    *   *Requisito de Personalización:* Debes seleccionar dos combinaciones de colores (fondo y texto) de tu propio gusto para las opciones 1 y 2. Modifica el texto del menú y calcula los atributos correspondientes usando el esquema IRGB del Paso C. **No se permite utilizar los colores del ejemplo de la guía (Blanco/Azul y Amarillo/Rojo)**; debes elegir colores únicos.
+    *   *Propuesta de Personalización:* Te sugiero seleccionar dos combinaciones de colores (fondo y texto) de tu propio gusto para las opciones 1 y 2. Modifica el texto del menú y calcula los atributos correspondientes usando el esquema IRGB del Paso C. **Te recomiendo no utilizar los colores del ejemplo de la guía (Blanco/Azul y Amarillo/Rojo)** para explorar colores diferentes.
 2.  **Lectura:** El programa debe esperar a que el usuario presione una tecla (`INT 16h / AH = 00h`). El código ASCII de la tecla presionada quedará en `AL`.
 3.  **Evaluación (Comparación):**
     *   Si el usuario presiona la tecla **`'1'`** (código ASCII `31h` o `'1'`): debe limpiar la pantalla, mover el cursor a la posición correspondiente y pintar **tus propias iniciales de nombre y apellido** (ejemplo: si te llamas Juan Pérez, usa `J.P.`) con tu **[Color A]** seleccionado, usando `INT 10h / AH = 09h` para cada carácter.
@@ -317,8 +319,4 @@ Diseña un programa que le permita al usuario elegir el color del texto a mostra
 
 ---
 
-### Indicaciones de entrega en Moodle
-
-Debes subir **dos archivos** con la nomenclatura estricta:
-1.  `practica[NombreApellido].asm` (El código incremental final del Paso E).
-2.  `ejercicio[NombreApellido].asm` (Tu solución al desafío del Menú de Colores).
+*Nota: Al ser esta una práctica de autoaprendizaje de carácter opcional, no es necesario que envíes o entregues estos archivos. ¡Úsalos libremente para estudiar y practicar por tu cuenta!*
